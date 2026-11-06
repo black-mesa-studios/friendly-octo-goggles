@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <chrono>
+#include <thread>
 
 #define YEAROFFSET   0b1111111111111100000000000000000000000000000000000000000000000000
 #define MONTHOFFSET  0b0000000000000011110000000000000000000000000000000000000000000000
@@ -22,7 +24,7 @@ namespace tl {
         std::uint64_t _time;
         public:
         Time(const std::uint64_t &time) : _time(time){}
-        
+
         void setTime(const std::uint64_t &time) {
             _time = time;
         }
@@ -66,7 +68,7 @@ namespace tl {
         uint8_t getHour() {
             return (_time & HOUROFFSET) >> HOURSHIFT;
         }
-        
+
         void setMinute(const std::uint8_t &min) {
             _time &= ~(MINUTEOFFSET);
             _time = _time | ((std::uint64_t)min << MINUTESHIFT);
@@ -95,4 +97,15 @@ namespace tl {
         }
 
     };
+    void sleep(int time, bool use_a_lot_of_cpu_power)
+    {
+        if (use_a_lot_of_cpu_power == true)
+        {
+        auto now = std::chrono::system_clock::now();
+        auto seconds = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+        while( seconds + time != std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count()) {}
+    } else {
+        std::this_thread::sleep_for(std::chrono::seconds(time));
+        }
+    }
 }
